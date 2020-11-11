@@ -78,15 +78,63 @@ app.route("/articles/:newTitle")
   .get(function(req, res) {
     const newTitle = req.params.newTitle;
     Article.findOne({
-      title: newTitle
-    }, function(err, foundArticle) {
+        title: newTitle
+      },
+      function(err, foundArticle) {
+        if (!err) {
+          res.send(foundArticle.content);
+        } else {
+          res.send("No article found with requested title!");
+        }
+      });
+  })
+
+  // update a record entirely
+  .put(function(req, res) {
+    Article.updateOne({
+        title: req.params.newTitle
+      }, {
+        title: req.body.title,
+        content: req.body.content
+      },
+      function(err) {
+        if (!err) {
+          res.send("Successfully updated the article.");
+        } else {
+          res.send(err);
+        }
+      }
+    )
+  })
+
+  .patch(function(req, res) {
+    Article.updateOne({
+      title: req.params.newTitle
+    }, {
+      $set: req.body
+    }, function(err) {
       if (!err) {
-        res.send(foundArticle.content);
+        res.send("Successfully updated the article.");
       } else {
         res.send(err);
       }
     });
+
   })
+
+  .delete(function(req, res) {
+    Article.deleteOne({
+        title: req.params.newTitle
+      },
+      function(err) {
+        if (!err) {
+          res.send("Successfully deleted the article.");
+        } else {
+          res.send(err);
+        }
+      });
+  });
+
 //#######################################################################
 
 app.listen(portNumber, function() {
